@@ -13,8 +13,7 @@ def second_page():
 
 products=[
     product(id=1,name='Phone',quantity=1,price=150000.0,description='Foldable Phone'),
-    product(id=2,name='Laptop',quantity=2,price=550000.0,description='Macbook'),
-    
+    product(id=2,name='Laptop',quantity=2,price=550000.0,description='Macbook'),   
 ]
 
 @app.get("/product")
@@ -33,3 +32,21 @@ def get_by_id(id:int):
 def add_product(productss:product):
     products.append(productss)
     return productss
+
+@app.put("/product")
+def edit_product(id:int, product3: product):
+    for i in range(len(products)):
+        if products[i].id==id:
+            products[i]=product3
+            return "product updated ssuccessfully "
+    return "Product not found "
+
+@app.delete("/product")
+def delete_product(id:int):
+    for i in range(len(products)):
+        if products[i].id==id:
+            del products[i]
+            return "Product Deleted "
+    return "Product not found"
+
+
