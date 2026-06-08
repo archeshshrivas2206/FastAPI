@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from models import product
+from database import sessionlocal,engine
+import db_models 
 
 app = FastAPI()
+
+db_models.base.metadata.create_all(bind= engine)
+
 
 @app.get("/")
 def greet():
@@ -16,6 +21,18 @@ products=[
     product(id=2,name='Laptop',quantity=2,price=550000.0,description='Macbook'),   
 ]
 
+
+def init_db():
+    db=sessionlocal()
+    count=db.query(db_models.product).count
+    if count==0:
+
+        for i in products:
+            db.add(db_models.product(**i.model_dump()))
+
+        db.commit()
+init_db()
+ 
 @app.get("/product")
 def get_all_product():
     return products
