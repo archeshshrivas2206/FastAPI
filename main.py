@@ -1,10 +1,17 @@
 from fastapi import Depends,FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from models import product
 from database import sessionlocal,engine
 import db_models 
 from sqlalchemy.orm import Session 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"]
+)
 
 db_models.base.metadata.create_all(bind= engine)
 
@@ -13,9 +20,9 @@ db_models.base.metadata.create_all(bind= engine)
 def greet():
     return "First time properly running a backend server "
 
-@app.get("/second")
-def second_page():
-    return "You are on the second page"
+# @app.get("/second")
+# def second_page():
+#     return "You are on the second page"
 
 products=[
     product(id=1,name='Phone',quantity=1,price=150000.0,description='Foldable Phone'),
@@ -42,7 +49,7 @@ def init_db():
 init_db()
 
 
-@app.post("/product")
+@app.post("/products")
 def add_product(productss:product,db: Session = Depends(get_db)):
     db.add(db_models.product(**productss.model_dump()))
     db.commit()
@@ -50,7 +57,7 @@ def add_product(productss:product,db: Session = Depends(get_db)):
 
 
 
-@app.get("/product")
+@app.get("/products")
 def get_all_product(db :Session = Depends(get_db)):
     db_product= db.query(db_models.product).all()
 
@@ -65,7 +72,7 @@ def get_all_product(db :Session = Depends(get_db)):
     #         return products[id-1]
     # return 'Product not found'
 
-@app.get("/product/{id}")
+@app.get("/products/{id}")
 def get_by_id(id:int, db: Session = Depends(get_db)):
     db_product=db.query(db_models.product).filter(db_models.product.id==id).first()
 
@@ -84,7 +91,7 @@ def get_by_id(id:int, db: Session = Depends(get_db)):
 #             return "product updated ssuccessfully "
 #     return "Product not found "
 
-@app.put("/product")
+@app.put("/products/{id}")
 def edit_product(id:int, product3: product, db: Session=Depends(get_db)):
     db_product = db.query(db_models.product).filter(db_models.product.id==id).first()
     if db_product:
@@ -107,7 +114,7 @@ def edit_product(id:int, product3: product, db: Session=Depends(get_db)):
 #     return "Product not found"
 
 
-@app.delete("/product")
+@app.delete("/products")
 def delete_product(id:int, db: Session= Depends(get_db)):
     db_product=db.query(db_models.product).filter(db_models.product.id==id).first()
     if db_product:
