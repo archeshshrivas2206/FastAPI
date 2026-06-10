@@ -98,12 +98,20 @@ def edit_product(id:int, product3: product, db: Session=Depends(get_db)):
         return "Product not found "
   
 
+# @app.delete("/product")
+# def delete_product(id:int):
+#     for i in range(len(products)):
+#         if products[i].id==id:
+#             del products[i]
+#             return "Product Deleted "
+#     return "Product not found"
+
+
 @app.delete("/product")
-def delete_product(id:int):
-    for i in range(len(products)):
-        if products[i].id==id:
-            del products[i]
-            return "Product Deleted "
+def delete_product(id:int, db: Session= Depends(get_db)):
+    db_product=db.query(db_models.product).filter(db_models.product.id==id).first()
+    if db_product:
+        db.delete(db_product)
+        db.commit()
+        return "product deleted successfully "
     return "Product not found"
-
-
