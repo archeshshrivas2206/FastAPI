@@ -75,15 +75,28 @@ def get_by_id(id:int, db: Session = Depends(get_db)):
     return "Product not found "
     
 
-
+#this is the way to do put without db
+# @app.put("/product")
+# def edit_product(id:int, product3: product):
+#     for i in range(len(products)):
+#         if products[i].id==id:
+#             products[i]=product3
+#             return "product updated ssuccessfully "
+#     return "Product not found "
 
 @app.put("/product")
-def edit_product(id:int, product3: product):
-    for i in range(len(products)):
-        if products[i].id==id:
-            products[i]=product3
-            return "product updated ssuccessfully "
-    return "Product not found "
+def edit_product(id:int, product3: product, db: Session=Depends(get_db)):
+    db_product = db.query(db_models.product).filter(db_models.product.id==id).first()
+    if db_product:
+        db_product.description=product3.description
+        db_product.name=product3.name
+        db_product.quantity=product3.quantity
+        db_product.price=product3.price
+        db.commit()
+        return "product updated"
+    else:
+        return "Product not found "
+  
 
 @app.delete("/product")
 def delete_product(id:int):
